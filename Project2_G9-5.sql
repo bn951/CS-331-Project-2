@@ -22,29 +22,44 @@ create table Process.WorkflowSteps(
 )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- ============================================= 
 -- Author:  Gen. Li
--- Procedure:   Process.WorkflowSteps table 
+-- Procedure:   Process.usp_TrackWorkFlow 
 -- Create date:  4/11
--- Description: a stored procedure to track 
+-- Description: A stored procedure to track the workflow
+
 -- ==============================================
+
+create procedure Process.usp_TrackWorkFlow 
+
+   @StartTime DATETIME2,    
+   @WorkFlowDescription NVARCHAR(100),     
+   @WorkFlowStepTableRowCount int,     
+   @UserAuthorization int 
+
+as
+
+select *
+from Process.WorkflowSteps
+where StartingDateTime=@StartTime and WorkFlowStepDescription=@WorkFlowDescription
+and WorkFlowStepTableRowCount=@WorkFlowStepTableRowCount and UserAuthorizationKey= @UserAuthorization
+
+go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
