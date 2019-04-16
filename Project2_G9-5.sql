@@ -39,3 +39,51 @@ INSERT INTO DbSecurity.UserAuthorization(
     ('Li', 'Gen'),
     ('Pevidal', 'Kirsten'),
     ('Padua', 'Kate');
+
+GO
+
+-- ============================================= 
+-- Author:  Gen. Li
+-- Procedure:   Process.WorkflowSteps table 
+-- Create date:  4/11
+-- Description: A table of each worksteps
+
+-- ==============================================
+create schema Process
+Go
+
+create sequence PkSequence.WorkflowStepsSequenceObject AS INT MINVALUE 1;
+
+create table Process.WorkflowSteps(
+		WorkFlowStepKey INT NOT NULL DEFAULT(NEXT VALUE FOR PkSequence.WorkflowStepsSequenceObject) primary key,
+		WorkFlowStepDescription NVARCHAR(100) NOT NULL,
+		WorkFlowStepTableRowCount INT NULL DEFAULT (0),
+		StartingDateTime DATETIME2(7) NULL DEFAULT (SYSDATETIME()),
+		EndingDateTime DATETIME2(7) NULL DEFAULT (SYSDATETIME()),
+		ClassTime CHAR(5) NULL DEFAULT ('09:15'),
+        UserAuthorizationKey INT NOT NULL 
+)
+
+Go
+
+-- ============================================= 
+-- Author:  Gen. Li
+-- Procedure:   Process.usp_TrackWorkFlow 
+-- Create date:  4/11
+-- Description: A stored procedure to track the workflow
+
+-- ==============================================
+
+create procedure Process.usp_TrackWorkFlow 
+
+   @StartTime DATETIME2,    
+   @WorkFlowDescription NVARCHAR(100),     
+   @WorkFlowStepTableRowCount int,     
+   @UserAuthorization int 
+
+as
+
+insert into Process.WorkflowSteps(WorkFlowStepDescription, WorkFlowStepTableRowCount, StartingDateTime, UserAuthorizationKey)
+values (@WorkFlowDescription, @WorkFlowStepTableRowCount, @StartTime, @UserAuthorization);
+
+go
