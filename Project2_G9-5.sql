@@ -29,8 +29,7 @@ create table Process.WorkflowSteps(
 -- Description: A stored procedure to track the workflow
 
 -- ==============================================
-
-create procedure Process.usp_TrackWorkFlow 
+alter procedure Process.usp_TrackWorkFlow 
 
    @StartTime DATETIME2,    
    @WorkFlowDescription NVARCHAR(100),     
@@ -39,27 +38,75 @@ create procedure Process.usp_TrackWorkFlow
 
 as
 
-select *
-from Process.WorkflowSteps
-where StartingDateTime=@StartTime and WorkFlowStepDescription=@WorkFlowDescription
-and WorkFlowStepTableRowCount=@WorkFlowStepTableRowCount and UserAuthorizationKey= @UserAuthorization
+insert into Process.WorkflowSteps(WorkFlowStepDescription, WorkFlowStepTableRowCount, StartingDateTime, UserAuthorizationKey)
+values (@WorkFlowDescription, @WorkFlowStepTableRowCount, @StartTime, @UserAuthorization);
 
 go
 
 
 
+-- ============================================= 
+-- Author:  Gen. Li
+-- Procedure: 
+-- Create date:  4/16
+-- Description: update new column
+
+-- ==============================================
+alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimCustomer]
+	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimGender] 
+	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimMaritalStatus]
+	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimOccupation] 
+	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimOrderDate] 
+	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimProduct]
+	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimTerritory]
+	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_SalesManagers]
+
+truncate table [CH01-01-Dimension].[DimCustomer]
+truncate table [CH01-01-Dimension].[DimGender]
+truncate table [CH01-01-Dimension].[DimMaritalStatus]
+truncate table [CH01-01-Dimension].[DimOccupation]
+truncate table [CH01-01-Dimension].[DimOrderDate]
+truncate table [CH01-01-Dimension].[DimProduct]
+truncate table [CH01-01-Dimension].[DimTerritory]
+truncate table [CH01-01-Dimension].[SalesManagers]
+
+
+alter table  [CH01-01-Dimension].[DimCustomer]
+alter column UserAuthorizationKey int not NULL
+	
+alter table [CH01-01-Dimension].[DimGender]
+add  UserAuthorizationKey INT NOT NULL,
+ DateAdded         datetime2   null default sysdatetime(),
+ DateOfLastUpdate datetime2   null default sysdatetime()
 
 
 
+alter table [CH01-01-Dimension].[DimMaritalStatus]
+add UserAuthorizationKey INT NOT NULL,
+ DateAdded         datetime2   null default sysdatetime(),
+ DateOfLastUpdate datetime2   null default sysdatetime()
 
+alter table [CH01-01-Dimension].[DimOccupation]
+add UserAuthorizationKey INT NOT NULL,
+ DateAdded         datetime2   null default sysdatetime(),
+ DateOfLastUpdate datetime2   null default sysdatetime()
 
+alter  table [CH01-01-Dimension].[DimOrderDate]
+add UserAuthorizationKey INT NOT NULL,
+ DateAdded         datetime2   null default sysdatetime(),
+ DateOfLastUpdate datetime2   null default sysdatetime()
 
+alter  table [CH01-01-Dimension].[DimProduct]
+add UserAuthorizationKey INT NOT NULL,
+ DateAdded         datetime2   null default sysdatetime(),
+ DateOfLastUpdate datetime2   null default sysdatetime()
 
+alter  table [CH01-01-Dimension].[DimTerritory]
+add UserAuthorizationKey INT NOT NULL,
+ DateAdded         datetime2   null default sysdatetime(),
+ DateOfLastUpdate datetime2   null default sysdatetime()
 
-
-
-
-
-
-
-
+alter  table [CH01-01-Dimension].[SalesManagers]
+add UserAuthorizationKey INT NOT NULL,
+ DateAdded         datetime2   null default sysdatetime(),
+ DateOfLastUpdate datetime2   null default sysdatetime()
