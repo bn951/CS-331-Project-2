@@ -1,4 +1,3 @@
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -10,7 +9,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Adds foreign keys.
 -- =============================================
-create procedure [Project2].[AddForeignKeysToStarSchemaData]
+create or alter procedure [Project2].[AddForeignKeysToStarSchemaData]
 	@UserAuthorizationKey int
 as
 begin
@@ -67,7 +66,6 @@ begin
 	alter table [CH01-01-Dimension].[DimProduct] check constraint [FK_DimProduct_DimProductSubcategory]
 end;
 ------------------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -79,12 +77,12 @@ go
 -- Create date: 04/14/2019
 -- Description: Drops foreign keys.
 -- =============================================
-create procedure [Project2].[DropForeignKeysFromStarSchemaData]
+create or alter procedure [Project2].[DropForeignKeysFromStarSchemaData]
 	@UserAuthorizationKey int
 as
 begin
 	set nocount on;
-
+	
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimCustomer]
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimGender] 
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimMaritalStatus]
@@ -93,9 +91,11 @@ begin
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimProduct]
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimTerritory]
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_SalesManagers]
+	
+	alter table [CH01-01-Dimension].[DimProduct] drop constraint [FK_DimProduct_DimProductSubcategory]
+	alter table [CH01-01-Dimension].[DimProductSubcategory] drop constraint [FK_DimProductSubcategory_DimProductCategory]
 end;
 ----------------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -107,7 +107,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads data.
 -- =============================================
-create procedure [Project2].[LoadData]
+create or alter procedure [Project2].[LoadData]
 	@UserAuthorizationKey int
 as
 begin
@@ -115,11 +115,10 @@ begin
 	set nocount on;
 	
 	insert into [CH01-01-Fact].Data
-		(SalesManagerKey, 
-		OccupationKey,
-		TerritoryKey, 
+		(TerritoryKey, 
 		ProductKey, 
 		CustomerKey,
+		SalesKey,
 		ProductCategory, 
 		SalesManager, 
 		ProductSubcategory, 
@@ -144,11 +143,10 @@ begin
 		TerritoryCountry, 
 		TerritoryGroup)
 	select 
-		orig.SalesManagerKey, 
-		orig.OccupationKey,
 		dt.TerritoryKey, 
 		dp.ProductKey, 
 		dc.CustomerKey,
+		orig.SalesKey,
 		orig.ProductCategory, 
 		orig.SalesManager, 
 		orig.ProductSubcategory, 
@@ -184,7 +182,6 @@ begin
 			on dc.CustomerName = orig.CustomerName
 end;
 --------------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -196,7 +193,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads the DimCustomer table.
 -- =============================================
-create procedure [Project2].[LoadDimCustomer]
+create or alter procedure [Project2].[LoadDimCustomer]
 	@UserAuthorizationKey int
 as
 begin
@@ -210,7 +207,6 @@ begin
 			on dc.CustomerName = orig.CustomerName;
 end;
 -----------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -222,7 +218,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimGender table.
 -- =============================================
-create procedure [Project2].[LoadDimGender]
+create or alter procedure [Project2].[LoadDimGender]
 	@UserAuthorizationKey int
 as
 begin
@@ -238,7 +234,6 @@ begin
 			on dg.Gender = orig.Gender
 end;
 ------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -250,7 +245,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Load DimMaritalStatus table.
 -- =============================================
-create procedure [Project2].[LoadDimMaritalStatus]
+create or alter procedure Project2.LoadDimMaritalStatus
 	@UserAuthorizationKey int
 as
 begin
@@ -268,7 +263,6 @@ begin
 			on dm.MaritalStatus = orig.MaritalStatus;
 end;
 --------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -280,7 +274,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimOccupation table.
 -- =============================================
-create procedure [Project2].[LoadDimOccupation]
+create or alter procedure [Project2].[LoadDimOccupation]
 	@UserAuthorizationKey int
 as
 begin
@@ -294,7 +288,6 @@ begin
 			on do.Occupation = orig.Occupation;
 end;
 -------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -306,7 +299,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimOrderDate table.
 -- =============================================
-create procedure [Project2].[LoadDimOrderDate]
+create or alter procedure [Project2].[LoadDimOrderDate]
 	@UserAuthorizationKey int
 as
 begin
@@ -323,7 +316,6 @@ begin
 				and dod.[Year] = orig.[Year];
 end;
 ---------------------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -335,7 +327,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimProduct table.
 -- =============================================
-create procedure [Project2].[LoadDimProduct]
+create or alter procedure [Project2].[LoadDimProduct]
 	@UserAuthorizationKey int
 as
 begin
@@ -356,7 +348,6 @@ begin
 			on dp.ProductSubcategoryKey = dps.ProductSubcategoryKey;
 end;
 ------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -368,7 +359,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimProductCategory table.
 -- =============================================
-create procedure [Project2].[LoadDimProductCategory]
+create or alter procedure [Project2].[LoadDimProductCategory]
 	@UserAuthorizationKey int
 as
 begin
@@ -376,14 +367,13 @@ begin
 
 	insert into [CH01-01-Dimension].DimProductCategory
 		(ProductCategoryKey, ProductCategory)
-	select orig.ProductCategoryKey, orig.ProductCategory 
+	select dpc.ProductCategoryKey, orig.ProductCategory 
 	from FileUpload.OriginallyLoadedData as orig 
 		inner join [CH01-01-Dimension].DimProductCategory as dpc
 			on dpc.ProductCategory = orig.ProductCategory 
 			and dpc.ProductCategoryKey = orig.ProductCategoryKey;
 end;
 ----------------------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -395,7 +385,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimProductSubcategory table.
 -- =============================================
-create procedure [Project2].[LoadDimProductSubcategory]
+create or alter procedure [Project2].[LoadDimProductSubcategory]
 	@UserAuthorizationKey int
 as
 begin
@@ -413,7 +403,6 @@ begin
 			and dpc.ProductSubcategoryKey = dps.ProductSubcategoryKey;
 end;
 ----------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -425,7 +414,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimTerritory table.
 -- =============================================
-create procedure [Project2].[LoadDimTerritory]
+create or alter procedure [Project2].[LoadDimTerritory]
 	@UserAuthorizationKey int
 as
 begin
@@ -441,7 +430,6 @@ begin
 			and	dt.TerritoryRegion = orig.TerritoryRegion;
 end;
 ------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -453,7 +441,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads SalesManagers table.
 -- =============================================
-create procedure [Project2].[LoadSalesManagers] 
+create or alter procedure [Project2].[LoadSalesManagers] 
 	@UserAuthorizationKey int
 as
 begin
@@ -469,7 +457,6 @@ begin
 			 and Office IS NULL;
 end;
 ----------------------------------------------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -481,23 +468,17 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads tables to star schema.
 -- =============================================
-create procedure [Project2].[LoadStarSchemaData]
---alter procedure [Project2].[LoadStarSchemaData]
+create or alter procedure [Project2].[LoadStarSchemaData]
 	@UserAuthorizationKey int
 as
 begin
     set nocount on;
 
 	-- Drop foreign keys before truncation
-	exec [Project2].[DropForeignKeysFromStarSchemeData];
-
-    --	Check row count before truncation
-    exec [Project2].[ShowTableStatusRowCount]
-		@UserAuthorizationKey = 2,
-		@TableStatus = N'''Pre-truncate of tables''';
+	exec [Project2].[DropForeignKeysFromStarSchemaData] @UserAuthorizationKey = 2;
 
 	-- Truncate star schema data
-	exec [Project2].[TruncateStarSchemaData];
+	exec Project2.TruncateStarSchemaDataUpd @UserAuthorizationKey = 2;
 
     -- Load the star schema
 	exec [Project2].[LoadDimProductCategory] @UserAuthorizationKey = 2;
@@ -512,16 +493,10 @@ begin
 	exec [Project2].[LoadDimCustomer] @UserAuthorizationKey = 2;
 	exec [Project2].[LoadData] @UserAuthorizationKey = 2;
 
-	-- Check row count after truncation
-    exec [Project2].[ShowTableStatusRowCount]
-		@UserAuthorizationKey = 2,
-		@TableStatus = N'''Post-truncate of tables''';
-
 	-- Recreate foreign keys after schema loading
-	exec [Project2].[AddForeignKeysToStarSchemeData] @UserAuthorizationKey = 2;
+	exec [Project2].[AddForeignKeysToStarSchemaData] @UserAuthorizationKey = 2;
 end;
 ---------------------------------------------------------------------------------------------------------------------
-use [BIClass];
 go
 set ansi_nulls on
 go
@@ -533,14 +508,11 @@ go
 -- Create date: 04/14/2019
 -- Description: Truncates schema data.
 -- =============================================
-create procedure [Project2].[TruncateStarSchemaData]
---alter procedure [Project2].[TruncateStarSchemaData]
+create or alter procedure Project2.TruncateStarSchemaDataUpd
 	@UserAuthorizationKey int
 as
 begin
 	set nocount on;
-
-	print 'insert your statements within the Begin\End block which is the equivalent of the Java { \ }'
 
 	truncate table [CH01-01-Dimension].DimCustomer;
 	truncate table [CH01-01-Dimension].DimGender;
@@ -554,3 +526,52 @@ begin
 	truncate table [CH01-01-Dimension].SalesManagers;
 	truncate table [CH01-01-Fact].data;
 end;
+
+
+
+--exec Project2.LoadStarSchemaData @UserAuthorizationKey = 2;
+
+-- =============================================
+-- Author: Kirsten Pevidal
+-- Procedure: Create Table [CH01-01-Dimension].[DimProductCategory] and [CH01-01-Dimension].[DimProductSubcategory]
+-- Create date: 04/13/2019
+-- Description: A table for product categorization
+-- =============================================
+
+GO
+
+/****** Object:  Table [dbo].[CH01-01-Dimension.DimProductCategory]    Script Date: 4/13/2019 9:56:05 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [CH01-01-Dimension].[DimProductCategory]
+(
+	[ProductCategoryKey] [int] NOT NULL,
+	[Productcategory] [varchar](20) NULL
+)
+
+GO
+CREATE TABLE [CH01-01-Dimension].[DimProductSubCategory]
+(
+	[ProductSubcategoryKey] [int] NOT NULL,
+	[ProductCategoryKey] [int] NOT NULL,
+	[ProductSubcategory] [varchar](20) NULL
+)
+GO
+--SET PRIMARY KEY
+ALTER TABLE [CH01-01-Dimension].[DimProductCategory] ADD PRIMARY KEY ([ProductCategoryKey])
+ALTER TABLE [CH01-01-Dimension].[DimProductSubcategory] ADD PRIMARY KEY ([ProductSubcategoryKey])
+--SET PARENT-CHILD RELATIONSHIP (DIMPRODUCTCATEGORY -> DIMPRODUCTSUBCATEGORY)
+ALTER TABLE [CH01-01-Dimension].[DimProductSubcategory]  WITH CHECK 
+ADD  CONSTRAINT [FK_DimProductSubcategory_DimProductCategory] FOREIGN KEY([ProductCategoryKey])
+REFERENCES [CH01-01-Dimension].[DimProductCategory] ([ProductCategoryKey])
+ALTER TABLE [CH01-01-Dimension].[DimProductSubcategory] CHECK CONSTRAINT [FK_DimProductSubcategory_DimProductCategory]
+
+--SET CHILD-GRANDCHILD RELATIONSHIP (DIMPRODUCTSUBCATEGORY -> DIMPRODUCT)
+ALTER TABLE [CH01-01-Dimension].[DimProduct]  WITH CHECK 
+ADD  CONSTRAINT [FK_DimProduct_DimProductSubcategory] FOREIGN KEY([ProductSubcategoryKey])
+REFERENCES [CH01-01-Dimension].[DimProductSubcategory] ([ProductSubcategoryKey])
+ALTER TABLE [CH01-01-Dimension].[DimProduct] CHECK CONSTRAINT [FK_DimProduct_DimProductSubcategory]
