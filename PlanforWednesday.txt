@@ -1,0 +1,8 @@
+Plan for Wednesday, 4/16/19
+
+1. Push stored procedures to RemoveFK, Truncate.
+2. RemoveFK, Truncate.
+3a. Create tables (Dimension tables, UserAuthorization, Workflow and related)
+3b. UserAuthorization columns; Change to sequence objects.
+4. Push Load_Table stored procedures
+5. Run Load_Star_Schema (subparts: RemoveFK, Truncate, Load_Tables, AddFK).
