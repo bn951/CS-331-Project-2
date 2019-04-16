@@ -425,7 +425,7 @@ go
 -- Create date: 04/14/2019
 -- Description: Loads DimTerritory table.
 -- =============================================
-create procedure [Project1].[LoadDimTerritory]
+create procedure [Project2].[LoadDimTerritory]
 	@UserAuthorizationKey int
 as
 begin
@@ -493,32 +493,32 @@ begin
 
     --	Check row count before truncation
     exec [Project2].[ShowTableStatusRowCount]
-		@UserAuthorizationKey = -1,
+		@UserAuthorizationKey = 2,
 		@TableStatus = N'''Pre-truncate of tables''';
 
 	-- Truncate star schema data
 	exec [Project2].[TruncateStarSchemaData];
 
     -- Load the star schema
-	exec [Project2].[LoadDimProductCategory] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimProductSubcategory] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimProduct] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadSalesManagers] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimGender] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimMaritalStatus] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimOccupation] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimOrderDate] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimTerritory] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadDimCustomer] @UserAuthorizationKey = -1;
-	exec [Project2].[LoadData] @UserAuthorizationKey = -1;
+	exec [Project2].[LoadDimProductCategory] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimProductSubcategory] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimProduct] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadSalesManagers] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimGender] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimMaritalStatus] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimOccupation] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimOrderDate] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimTerritory] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadDimCustomer] @UserAuthorizationKey = 2;
+	exec [Project2].[LoadData] @UserAuthorizationKey = 2;
 
 	-- Check row count after truncation
     exec [Project2].[ShowTableStatusRowCount]
-		@UserAuthorizationKey = -1,
+		@UserAuthorizationKey = 2,
 		@TableStatus = N'''Post-truncate of tables''';
 
 	-- Recreate foreign keys after schema loading
-	exec [Project1].[AddForeignKeysToStarSchemeData] @UserAuthorizationKey = -1;
+	exec [Project2].[AddForeignKeysToStarSchemeData] @UserAuthorizationKey = 2;
 end;
 ---------------------------------------------------------------------------------------------------------------------
 use [BIClass];
