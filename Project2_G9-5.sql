@@ -1,4 +1,7 @@
---PROJECT 2-G95
+/*PROJECT 2-G95
+  Member: Bobby Nijjar, Philip Ma, Gen Li, Kirsten Pevidal, Kate Padua
+  Description: Recreate Star Schema
+*/
 -- ============================================= 
 -- Author:  Bobby Nijjar
 -- Procedure:   DbSecurity.UserAuthorization
@@ -6,6 +9,7 @@
 -- Description: Table containing each Group Member
 -- ==============================================
 -- Create Schemas
+USE BICLASS
 CREATE SCHEMA DbSecurity;
 GO
 CREATE SCHEMA PkSequence;
@@ -82,7 +86,19 @@ CREATE or Alter PROCEDURE Process.usp_ShowWorkflowSteps
 AS
 BEGIN
 set nocount on;
---select * from process.WorkflowSteps
+select * from process.WorkflowSteps
+END;
+-- =============================================
+-- Author: Kate Padua
+-- Procedure: Process.usp_TotalExecutionTime
+-- Create date: 04/18/2019
+-- Description: SHOW WORK TOTAL EXECUTION TIME
+-- =============================================
+GO
+CREATE or Alter PROCEDURE Process.usp_TotalExecutionTime
+AS
+BEGIN
+set nocount on;
 select [total run time in seconds]=
 cast(
 	DATEDIFF(millisecond,min(startingdatetime),MAX(endingdatetime))
@@ -141,7 +157,6 @@ as
 begin
 	set nocount on;
 	declare @CurrentTime datetime2 = SYSDATETIME();
-	declare @UserAuthorizationKey int = @userAuthorizationKey
 	
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimCustomer]
 	alter table [CH01-01-Fact].[Data] drop constraint [FK_Data_DimGender] 
@@ -156,6 +171,7 @@ begin
 	alter table [CH01-01-Dimension].[DimProductSubcategory] drop constraint [FK_DimProductSubcategory_DimProductCategory]
 
 	exec Process.usp_TrackWorkFlow @StartTime = @CurrentTime, @WorkFlowDescription = 'Drops FK from tables', @WorkFlowStepTableRowCount = @@RowCount, @UserAuthorization = @UserAuthorizationKey;
+
 end;
 -- =============================================
 -- Author: Phillip Ma
@@ -170,6 +186,7 @@ begin
 	set nocount on;
 	declare @CurrentTime datetime2 = SYSDATETIME();
 
+	--truncate table Process.WorkflowSteps;
 	truncate table [CH01-01-Dimension].DimCustomer;
 	truncate table [CH01-01-Dimension].DimGender;
 	truncate table [CH01-01-Dimension].DimMaritalStatus;
@@ -181,15 +198,15 @@ begin
 	truncate table [CH01-01-Dimension].DimTerritory;
 	truncate table [CH01-01-Dimension].SalesManagers;
 	truncate table [CH01-01-Fact].data;
-	truncate table Process.WorkflowSteps;
+
 
 	exec Process.usp_TrackWorkFlow @StartTime = @CurrentTime, @WorkFlowDescription = 'Truncate Star Schema', @WorkFlowStepTableRowCount = @@RowCount, @UserAuthorization = @UserAuthorizationKey;
 end;
 
 --------------------------------------------------------------
 -- Add UserAuthorizationKeys, DateAdded, DateOfLastUpdate
-	exec [Project2].[DropForeignKeysFromStarSchemaData] @UserAuthorizationKey = 2;
-	exec Project2.TruncateStarSchemaDataUpd @UserAuthorizationKey = 2;
+	--exec [Project2].[DropForeignKeysFromStarSchemaData] @UserAuthorizationKey = 2;
+	--exec Project2.TruncateStarSchemaDataUpd @UserAuthorizationKey = 2;
 -- ============================================= 
 -- Author:  Gen. Li
 -- Procedure: 
@@ -269,19 +286,18 @@ ALTER TABLE [CH01-01-Dimension].SalesManagers
     ADD SalesManagerKey INT NOT NULL DEFAULT(NEXT VALUE FOR PkSequence.SalesManagersSequenceObject) PRIMARY KEY CLUSTERED;
 
 -- TRUNCATE TABLE [CH01-01-Fact].Data
-
+--DROP CONSTRAINT [PK__Data__C104F6F1B36516E7];
 CREATE SEQUENCE PkSequence.DataSequenceObject AS INT MINVALUE 1;
 ALTER TABLE [CH01-01-Fact].Data
---DROP CONSTRAINT [PK__Data__C104F6F1B36516E7];
 DROP CONSTRAINT [PK_Data];
+
 ALTER TABLE [CH01-01-Fact].Data
     DROP COLUMN SalesKey;
-
 ALTER TABLE [CH01-01-Fact].Data
     ADD SalesKey INT NOT NULL DEFAULT(NEXT VALUE FOR PkSequence.DataSequenceObject) PRIMARY KEY CLUSTERED;
 
 --exec [Project2].[LoadStarSchemaData] @UserAuthorizationKey = 2;
-exec [Project2].[DropForeignKeysFromStarSchemaData]  @UserAuthorizationKey  = 2 ;
+--exec [Project2].[DropForeignKeysFromStarSchemaData]  @UserAuthorizationKey  = 2 ;
 
 -- =============================================
 -- Author: Phillip Ma
@@ -750,6 +766,12 @@ begin
 	exec Process.usp_TrackWorkFlow @StartTime = @CurrentTime, @WorkFlowDescription = 'Load StarSchema', @WorkFlowStepTableRowCount = @@RowCount, @UserAuthorization = @UserAuthorizationKey ;
 end;
 
+--TEST THE QUERY
+truncate table Process.WorkflowSteps;
+ALTER SEQUENCE PkSequence.WorkflowStepsSequenceObject RESTART WITH 1 ;  
 exec [Project2].[LoadStarSchemaData]
 	@UserAuthorizationKey=4
 EXEC [Process].[usp_ShowWorkflowSteps]
+EXEC Process.usp_TotalExecutionTime
+--CHECK FACT.DATA TABLE
+SELECT * FROM [CH01-01-Fact].DATA
