@@ -82,7 +82,7 @@ CREATE or Alter PROCEDURE Process.usp_ShowWorkflowSteps
 AS
 BEGIN
 set nocount on;
-select * from process.WorkflowSteps
+--select * from process.WorkflowSteps
 select [total run time in seconds]=
 cast(
 	DATEDIFF(millisecond,min(startingdatetime),MAX(endingdatetime))
